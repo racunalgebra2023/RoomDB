@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Room DB</string>
+    <string name="enter_task_name">Enter Task Name</string>
+    <string name="enter_task_description">Enter Task Description</string>
+    <string name="add_task">Add Task</string>
+    <string name="delete_all">Delete all</string>
+</resources>
