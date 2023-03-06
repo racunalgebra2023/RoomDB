@@ -96,9 +96,11 @@ class MainActivity : AppCompatActivity( ) {
     }
 
     private fun clearFields( ) {
-        binding.etTaskName.setText( "" )
-        binding.etTaskDescription.setText( "" )
-        binding.etTaskName.requestFocus( )
+        AppExecutors.instance?.mainThread( )?.execute {
+            binding.etTaskName.setText("")
+            binding.etTaskDescription.setText("")
+            binding.etTaskName.requestFocus()
+        }
     }
 
     private fun updateList( ) {
