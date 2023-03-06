@@ -16,7 +16,7 @@ interface TaskDao {
     fun loadByName( name : String ): List< Task >
 
     @Insert
-    fun insertAll( vararg tasks: Task )
+    fun insertAll( vararg tasks : Task )
 
     @Delete
     fun delete( task: Task )

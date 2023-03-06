@@ -8,5 +8,5 @@ import androidx.room.PrimaryKey
 data class Task(
     @PrimaryKey( autoGenerate = true ) var id          : Long,
     @ColumnInfo(name = "title")        var title       : String,
-    @ColumnInfo(name = "description")  var description : String,
+    @ColumnInfo(name = "description")  var description : String
 )

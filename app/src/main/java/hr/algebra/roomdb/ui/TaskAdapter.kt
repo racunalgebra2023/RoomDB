@@ -7,7 +7,21 @@ import androidx.recyclerview.widget.RecyclerView
 import hr.algebra.roomdb.databinding.ItemBinding
 import hr.algebra.roomdb.model.Task
 
-class TaskAdapter( val tasks : MutableList< Task > ) : RecyclerView.Adapter< TasksViewHolder >( ){
+interface OnItemClickListener {
+    fun onItemClick( item : Task )
+}
+
+class TaskAdapter( val tasks : MutableList< Task >, val listener : OnItemClickListener ) : RecyclerView.Adapter< TasksViewHolder >( ){
+
+    fun add( task : Task ) {
+        tasks.add( task )
+    }
+    fun delete( task : Task ) {
+        tasks.remove( task )
+    }
+    fun deleteAll(  ) {
+        tasks.clear( )
+    }
 
     override fun onCreateViewHolder( parent: ViewGroup, viewType: Int ) : TasksViewHolder {
         val taskBinding = ItemBinding
@@ -16,9 +30,12 @@ class TaskAdapter( val tasks : MutableList< Task > ) : RecyclerView.Adapter< Tas
     }
 
     override fun onBindViewHolder( holder: TasksViewHolder, position : Int ) {
-        val todo = tasks[position]
-        holder.tvTitle.text       = todo.title
-        holder.tvDescription.text = todo.description
+        val task = tasks[position]
+        holder.tvTitle.text       = task.title
+        holder.tvDescription.text = task.description
+        holder.itemView.setOnClickListener {
+            listener.onItemClick( task )
+        }
     }
 
     override fun getItemCount( ): Int = tasks.size
