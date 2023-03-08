@@ -25,7 +25,7 @@ abstract class AppDatabase : RoomDatabase() {
                 AppDatabase::class.java,
                 "tasks.db"
             )
-//            .allowMainThreadQueries( )
+//          .allowMainThreadQueries( )
             .build( )
     }
 }

@@ -11,8 +11,15 @@ interface OnItemClickListener {
     fun onItemClick( item : Task )
 }
 
-class TaskAdapter( val tasks : MutableList< Task >, val listener : OnItemClickListener ) : RecyclerView.Adapter< TasksViewHolder >( ){
+class TaskAdapter( val listener : OnItemClickListener ) : RecyclerView.Adapter< TasksViewHolder >( ){
 
+     var tasks : List< Task > = mutableListOf( )
+         set( value ) {
+             field = value
+             notifyDataSetChanged( )
+         }
+
+/*
     fun add( task : Task ) {
         tasks.add( task )
     }
@@ -22,7 +29,7 @@ class TaskAdapter( val tasks : MutableList< Task >, val listener : OnItemClickLi
     fun deleteAll(  ) {
         tasks.clear( )
     }
-
+*/
     override fun onCreateViewHolder( parent: ViewGroup, viewType: Int ) : TasksViewHolder {
         val taskBinding = ItemBinding
                             .inflate( LayoutInflater.from( parent.context ), parent, false )

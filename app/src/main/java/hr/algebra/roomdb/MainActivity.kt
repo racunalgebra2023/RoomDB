@@ -13,6 +13,7 @@ import hr.algebra.roomdb.model.Task
 import hr.algebra.roomdb.ui.OnItemClickListener
 import hr.algebra.roomdb.ui.TaskAdapter
 
+
 class MainActivity : AppCompatActivity( ) {
 
     private lateinit var binding : ActivityMainBinding
@@ -31,6 +32,8 @@ class MainActivity : AppCompatActivity( ) {
         Log.i( TAG, "Dohvatio sam bazu podataka!" )
         setupRecyclerView( )
 
+        observeDataChanged( )
+
         binding.bAdd.setOnClickListener {
             val taskName = binding.etTaskName.text.toString( )
             val taskDesc = binding.etTaskDescription.text.toString( )
@@ -38,12 +41,71 @@ class MainActivity : AppCompatActivity( ) {
                 Log.i( TAG, "Inserting row to the database." )
                 val task = Task( 0, taskName,taskDesc )
                 AppExecutors.instance?.diskIO( )?.execute {
-                    db.taskDao().insertAll( task )
-                    adapter.add( task )
+                    db.taskDao( ).insertAll( task )
+//                    adapter.add( task )
+//                    updateList( )
                     clearFields( )
-                    updateList( )
                 }
             }
+        }
+    }
+
+    private fun observeDataChanged( ) {
+        db.taskDao( ).getAll( ).observe( this ) {
+            Log.i( TAG, "Something has been changed" )
+            adapter.tasks = it
+        }
+    }
+
+    private fun setupRecyclerView( ) {
+        binding.rvTasks.layoutManager = LinearLayoutManager( this )
+        adapter = TaskAdapter( object : OnItemClickListener {
+                        override fun onItemClick( task : Task ) {
+                            AppExecutors.instance?.diskIO( )?.execute {
+                                Log.i( TAG, "Ubijam task: $task" )
+                                db.taskDao( ).delete( task )
+                            }
+                        }
+                    } )
+        binding.rvTasks.adapter = adapter
+    }
+
+    override fun onCreateOptionsMenu( menu: Menu? ): Boolean {
+        menuInflater.inflate( R.menu.menu, menu )
+        return true
+    }
+
+    override fun onOptionsItemSelected( item : MenuItem): Boolean {
+        if( item.itemId==R.id.menuDeleteAll ) {
+            AppExecutors.instance?.diskIO( )?.execute {
+                db.taskDao( ).deleteAll( )
+//              adapter.deleteAll( )
+//              updateList( )
+            }
+        }
+        return true
+    }
+
+    private fun validateFields( title : String, description : String ) : Boolean {
+        if( title.isEmpty( ) )
+            binding.etTaskName.error = "Title is missing"
+        if( description.isEmpty( ) )
+            binding.etTaskDescription.error = "Description is missing"
+
+        return !( title.isEmpty( )||description.isEmpty( ) )
+    }
+
+    private fun clearFields( ) {
+        AppExecutors.instance?.mainThread( )?.execute {
+            binding.etTaskName.setText("")
+            binding.etTaskDescription.setText("")
+            binding.etTaskName.requestFocus()
+        }
+    }
+/*
+    private fun updateList( ) {
+        AppExecutors.instance?.mainThread( )?.execute {
+            adapter.notifyDataSetChanged( )
         }
     }
 
@@ -69,43 +131,5 @@ class MainActivity : AppCompatActivity( ) {
             }
         }
     }
-
-    override fun onCreateOptionsMenu( menu: Menu? ): Boolean {
-        menuInflater.inflate( R.menu.menu, menu )
-        return true
-    }
-
-    override fun onOptionsItemSelected( item : MenuItem): Boolean {
-        if( item.itemId==R.id.menuDeleteAll ) {
-            AppExecutors.instance?.diskIO( )?.execute {
-                db.taskDao( ).deleteAll( )
-                adapter.deleteAll( )
-                updateList( )
-            }
-        }
-        return true
-    }
-
-    private fun validateFields( title : String, description : String ) : Boolean {
-        if( title.isEmpty( ) )
-            binding.etTaskName.error = "Title is missing"
-        if( description.isEmpty( ) )
-            binding.etTaskDescription.error = "Description is missing"
-
-        return !( title.isEmpty( )||description.isEmpty( ) )
-    }
-
-    private fun clearFields( ) {
-        AppExecutors.instance?.mainThread( )?.execute {
-            binding.etTaskName.setText("")
-            binding.etTaskDescription.setText("")
-            binding.etTaskName.requestFocus()
-        }
-    }
-
-    private fun updateList( ) {
-        AppExecutors.instance?.mainThread( )?.execute {
-            adapter.notifyDataSetChanged( )
-        }
-    }
+ */
 }
